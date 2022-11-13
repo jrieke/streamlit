@@ -43,6 +43,24 @@ module.exports = (on, config) => {
     },
   })
 
+  on("before:browser:launch", (browser, launchOptions) => {
+    // fullPage screenshot size is 3000x1200
+    const [width, height] = [3000, 1200]
+    if (browser.name === "chrome" && browser.isHeadless) {
+      launchOptions.args.push(`--window-size=${width},${height}`)
+
+      // force screen to be non-retina
+      launchOptions.args.push("--force-device-scale-factor=1")
+    }
+
+    if (browser.name === "electron" && browser.isHeadless) {
+      launchOptions.preferences.width = width
+      launchOptions.preferences.height = height
+    }
+
+    return launchOptions
+  })
+
   // https://github.com/palmerhq/cypress-image-snapshot#installation
   addMatchImageSnapshotPlugin(on, config)
 }
